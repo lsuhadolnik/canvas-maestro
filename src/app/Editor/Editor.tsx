@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { WindowsProvider, useWindows } from './WindowsContext';
 import WindowComponent from './WindowComponent';
 import MonacoEditor from '@monaco-editor/react';
+import { FaPlay, FaStop, FaExpand, FaCompress, FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Import icons
 
 const WindowsContainer = () => {
     const { windows } = useWindows();
@@ -15,7 +16,7 @@ const WindowsContainer = () => {
             ))}
         </div>
     );
-}
+};
 
 const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -29,43 +30,49 @@ const toggleFullScreen = () => {
     }
 };
 
-
 const AppWithSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [stepCount, setStepCount] = useState(0);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    const scriptChanged = (newScript: any) => {
+        debugger;
+    }
+
     return (
         <div className="flex h-screen">
             {isSidebarOpen && (
-                <div className="w-64 text-white">
-                    <MonacoEditor height="calc(100vh - 100px)" defaultLanguage="javascript" theme="vs-dark" />
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        Start
-                    </button>
-                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Stop
-                    </button>
-                    <div>Step Counter: {stepCount}</div>
-                    <button onClick={toggleFullScreen} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    Full-Screen
-</button>
+                <div className="w-64">
+                    <div className="flex items-center justify-between mb-4">
+                        <button onClick={() => {}} className="flex items-center p-2 text-gray-600">
+                            <FaPlay className="" />
+                        </button>
+                        <button onClick={() => {}} className="flex items-center p-2 text-gray-600">
+                            <FaStop className="" />
+                        </button>
+                        <div>Step: {stepCount}</div>
+                        <button onClick={toggleFullScreen} className="flex items-center p-2 text-gray-600">
+                            {isFullScreen ? <FaCompress className="" /> : <FaExpand className="" />}
+                        </button>
+                    </div>
+                    <MonacoEditor height="calc(100vh - 100px)" defaultLanguage="text" options={{
+                        minimap: { enabled: false },
+                    }} theme="vs-dark" onChange={scriptChanged} />
                 </div>
             )}
             <div className="flex-grow">
                 <button onClick={toggleSidebar} className="p-4">
-                    {isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
+                    {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
                 </button>
                 <WindowsContainer />
             </div>
         </div>
     );
 };
-
-
 
 export const Editor = () => {
     return (
