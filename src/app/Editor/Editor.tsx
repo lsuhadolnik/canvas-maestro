@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { WindowsProvider, useWindows } from "./WindowsContext";
 import WindowComponent from "./WindowComponent";
+import {useCodeExecutor} from './Execution/useCodeExecutor';
 import MonacoEditor from "@monaco-editor/react";
 import {
   FaPlay,
@@ -33,9 +34,22 @@ const AppWithSidebar = () => {
   const [stepCount, setStepCount] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(256);
+  const { executeScript } = useCodeExecutor();
+  const [code, setCode] = useState<string>("");
+
+  const editorRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const runCode = async () => {
+    try {
+      const result = await executeScript(code);
+      console.log(result); // If the executed code returns something
+    } catch (error) {
+      // Handle the error, show a notification to the user, etc.
+    }
   };
 
   const toggleFullScreen = () => {
@@ -54,10 +68,6 @@ const AppWithSidebar = () => {
     }
   };
 
-  const scriptChanged = (newScript: any) => {
-    debugger;
-  };
-
   const Sidebar = (
     <div className={"w-100 flex flex-col"}>
       <div
@@ -68,8 +78,7 @@ const AppWithSidebar = () => {
       >
         <Image src={logo} alt="Canvas Maestro Logo" width={40} height={40} />
         <div className="flex items-center">
-          <FaPlay className="text-gray-300 hover:text-white cursor-pointer" />
-          <FaStop className="text-gray-300 hover:text-white cursor-pointer mx-2" />
+          <FaPlay className="text-gray-300 hover:text-white cursor-pointer" onClick={runCode} />
           {isFullScreen ? (
             <FaCompress
               className="text-gray-300 hover:text-white cursor-pointer"
@@ -95,6 +104,7 @@ const AppWithSidebar = () => {
         height="calc(100vh - 30px)"
         defaultLanguage="javascript"
         theme="vs-dark"
+        onChange={(value) => setCode(value as any)}
       />
     </div>
   );
@@ -119,7 +129,6 @@ const AppWithSidebar = () => {
         <button onClick={toggleSidebar} className="p-4">
           <div className="hover:bg-gray-600 p-4 rounded">
             {isSidebarOpen ? <FaChevronRight /> : <FaChevronLeft />}
-            {/* Use appropriate icons or text */}
           </div>
         </button>
         <WindowsContainer />
