@@ -1,85 +1,137 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { WindowsProvider, useWindows } from './WindowsContext';
-import WindowComponent from './WindowComponent';
-import MonacoEditor from '@monaco-editor/react';
-import { FaPlay, FaStop, FaExpand, FaCompress, FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Import icons
-import logo from './logo.svg'; // Update with the correct path to your logo
-
+import React, { useState } from "react";
+import { WindowsProvider, useWindows } from "./WindowsContext";
+import WindowComponent from "./WindowComponent";
+import MonacoEditor from "@monaco-editor/react";
+import {
+  FaPlay,
+  FaStop,
+  FaExpand,
+  FaCompress,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa"; // Import icons
+import logo from "../../../public/logo.svg"; // Update with the correct path to your logo
+import Image from "next/image";
+import { Resizable } from "re-resizable";
 
 const WindowsContainer = () => {
-    const { windows } = useWindows();
+  const { windows } = useWindows();
 
-    return (
-        <div>
-            {windows.map(window => (
-                <WindowComponent key={window.id} id={window.id} />
-            ))}
-        </div>
-    );
-};
-
-const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((e) => {
-            console.error(`Error attempting to enable full-screen mode: ${e.message}`);
-        });
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    }
+  return (
+    <div>
+      {windows.map((window) => (
+        <WindowComponent key={window.id} id={window.id} />
+      ))}
+    </div>
+  );
 };
 
 const AppWithSidebar = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [stepCount, setStepCount] = useState(0);
-    const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [stepCount, setStepCount] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(256);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-    const scriptChanged = (newScript: any) => {
-        debugger;
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((e) => {
+        console.error(
+          `Error attempting to enable full-screen mode: ${e.message}`
+        );
+      });
+      setIsFullScreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullScreen(false);
+      }
     }
+  };
 
-    return (
-        <div className="flex h-screen">
-            {isSidebarOpen && (
-                <div className="w-64">
-                    <div className="flex items-center justify-between mb-4">
-                        <button onClick={() => {}} className="flex items-center p-2 text-gray-600">
-                            <FaPlay className="" />
-                        </button>
-                        <button onClick={() => {}} className="flex items-center p-2 text-gray-600">
-                            <FaStop className="" />
-                        </button>
-                        <div>Step: {stepCount}</div>
-                        <button onClick={toggleFullScreen} className="flex items-center p-2 text-gray-600">
-                            {isFullScreen ? <FaCompress className="" /> : <FaExpand className="" />}
-                        </button>
-                    </div>
-                    <MonacoEditor height="calc(100vh - 30px)" defaultLanguage="text" options={{
-                        minimap: { enabled: false },
-                    }} theme="vs-dark" onChange={scriptChanged} />
-                </div>
-            )}
-            <div className="flex-grow">
-                <button onClick={toggleSidebar} className="p-4">
-                    {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
-                </button>
-                <WindowsContainer />
-            </div>
+  const scriptChanged = (newScript: any) => {
+    debugger;
+  };
+
+  const Sidebar = (
+    <div className={"w-100 flex flex-col"}>
+      <div
+        className="flex items-center justify-between px-4 py-2 border-b border-gray-700"
+        style={{
+          backgroundImage: "linear-gradient(180deg, #303030 0%, #1E1E1E 100%)",
+        }}
+      >
+        <Image src={logo} alt="Canvas Maestro Logo" width={40} height={40} />
+        <div className="flex items-center">
+          <FaPlay className="text-gray-300 hover:text-white cursor-pointer" />
+          <FaStop className="text-gray-300 hover:text-white cursor-pointer mx-2" />
+          {isFullScreen ? (
+            <FaCompress
+              className="text-gray-300 hover:text-white cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          ) : (
+            <FaExpand
+              className="text-gray-300 hover:text-white cursor-pointer"
+              onClick={toggleFullScreen}
+            />
+          )}
         </div>
-    );
+        <div className="flex items-center bg-gray-700 text-white text-sm font-medium px-2 py-1 rounded">
+          <span
+            className="font-semibold"
+            style={{ fontFamily: "PT Sans, sans-serif" }}
+          >
+            {stepCount.toString().padStart(4, "0")}
+          </span>
+        </div>
+      </div>
+      <MonacoEditor
+        height="calc(100vh - 30px)"
+        defaultLanguage="javascript"
+        theme="vs-dark"
+      />
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen">
+      <Resizable
+        style={{ visibility: isSidebarOpen ? "visible" : "hidden" }}
+        size={{ width: isSidebarOpen ? sidebarWidth : 0, height: "100vh" }}
+        onResizeStop={(e, direction, ref, d) => {
+          setSidebarWidth(sidebarWidth + d.width);
+        }}
+        minWidth={isSidebarOpen ? 200 : 0} // Minimum width of the sidebar
+        maxWidth="80%" // Maximum width of the sidebar
+        enable={{ right: true }} // Enable resizing from the right edge of the sidebar
+        className="bg-black flex-none"
+      >
+        {Sidebar}
+      </Resizable>
+
+      <div className="flex-grow">
+        <button onClick={toggleSidebar} className="p-4">
+          <div className="hover:bg-gray-600 p-4 rounded">
+            {isSidebarOpen ? <FaChevronRight /> : <FaChevronLeft />}
+            {/* Use appropriate icons or text */}
+          </div>
+        </button>
+        <WindowsContainer />
+      </div>
+    </div>
+  );
 };
 
 export const Editor = () => {
-    return (
-        <WindowsProvider>
-            <AppWithSidebar />
-        </WindowsProvider>
-    );
+  return (
+    <WindowsProvider>
+      <AppWithSidebar />
+    </WindowsProvider>
+  );
 };
