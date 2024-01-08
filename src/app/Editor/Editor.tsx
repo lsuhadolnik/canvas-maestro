@@ -68,6 +68,15 @@ const AppWithSidebar = () => {
     }
   };
 
+  const codeChanged = (newCode: string) => {
+    setCode(newCode);
+    localStorage.setItem("code", newCode);
+  }
+
+  const getDefaultCode = () => {
+    return localStorage.getItem("code") || "";
+  }
+
   const Sidebar = (
     <div className={"w-100 flex flex-col"}>
       <div
@@ -76,9 +85,9 @@ const AppWithSidebar = () => {
           backgroundImage: "linear-gradient(180deg, #303030 0%, #1E1E1E 100%)",
         }}
       >
-        <Image src={logo} alt="Canvas Maestro Logo" width={40} height={40} />
+        <Image src={logo} alt="Canvas Maestro Logo" width={100} />
         <div className="flex items-center">
-          <FaPlay className="text-gray-300 hover:text-white cursor-pointer" onClick={runCode} />
+          <FaPlay className="text-gray-300 hover:text-white cursor-pointer pr-2" onClick={runCode} />
           {isFullScreen ? (
             <FaCompress
               className="text-gray-300 hover:text-white cursor-pointer"
@@ -103,8 +112,9 @@ const AppWithSidebar = () => {
       <MonacoEditor
         height="calc(100vh - 30px)"
         defaultLanguage="javascript"
+        defaultValue={getDefaultCode()}
         theme="vs-dark"
-        onChange={(value) => setCode(value as any)}
+        onChange={codeChanged}
       />
     </div>
   );
