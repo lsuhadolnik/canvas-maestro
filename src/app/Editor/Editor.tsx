@@ -5,6 +5,8 @@ import { WindowsProvider, useWindows } from './WindowsContext';
 import WindowComponent from './WindowComponent';
 import MonacoEditor from '@monaco-editor/react';
 import { FaPlay, FaStop, FaExpand, FaCompress, FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Import icons
+import logo from './logo.svg'; // Update with the correct path to your logo
+
 
 const WindowsContainer = () => {
     const { windows } = useWindows();
@@ -59,7 +61,7 @@ const AppWithSidebar = () => {
                             {isFullScreen ? <FaCompress className="" /> : <FaExpand className="" />}
                         </button>
                     </div>
-                    <MonacoEditor height="calc(100vh - 100px)" defaultLanguage="text" options={{
+                    <MonacoEditor height="calc(100vh - 30px)" defaultLanguage="text" options={{
                         minimap: { enabled: false },
                     }} theme="vs-dark" onChange={scriptChanged} />
                 </div>

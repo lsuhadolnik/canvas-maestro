@@ -7,7 +7,7 @@ export const WindowsProvider = (props: any) => {
   const children = props.children;
 
   const [windows, setWindows] = useState<WindowProps[]>([
-    {
+    /*{
       id: "window1",
       x: 100,
       y: 100,
@@ -48,7 +48,7 @@ export const WindowsProvider = (props: any) => {
       height: 200,
       content: "Demo text for testing the window component.",
       contentType: "code",
-    },
+    },*/
   ]);
 
   const updateWindow = (id: string, newProps: Partial<WindowProps>) => {
